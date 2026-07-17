@@ -24,14 +24,15 @@ import reportRoutes from "./routes/reportRoutes.js";
 
 dotenv.config();
 
-// Database Connection
+// Connect Database
 connectDB();
 
 const app = express();
 
 const server = http.createServer(app);
 
-// Socket.IO Configuration
+// Socket.IO
+
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:5173", "https://your-frontend-url.vercel.app"],
@@ -41,7 +42,8 @@ const io = new Server(server, {
 
 chatSocket(io);
 
-// CORS Configuration
+// CORS
+
 app.use(
   cors({
     origin: ["http://localhost:5173"],
@@ -50,6 +52,7 @@ app.use(
 );
 
 // Body Parser
+
 app.use(
   express.json({
     limit: "10mb",
@@ -63,7 +66,7 @@ app.use(
   }),
 );
 
-// API Routes
+// Routes
 
 app.use("/api/auth", authRoutes);
 
@@ -81,14 +84,12 @@ app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/reports", reportRoutes);
 
-// Static Images Folder
+// Cloudinary use गरेकोले uploads folder हटाइएको छ
 
-app.use("/uploads", express.static("uploads"));
-
-// Test Route
+// Test API
 
 app.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     message: "Clothing Swap API Running 🚀",
     status: "success",
   });
@@ -97,15 +98,14 @@ app.get("/", (req, res) => {
 // Error Handler
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err);
 
   res.status(500).json({
-    message: "Something went wrong",
-    error: err.message,
+    message: err.message || "Server Error",
   });
 });
 
-// Server Start
+// Server
 
 const PORT = process.env.PORT || 5000;
 
