@@ -24,128 +24,86 @@ import reportRoutes from "./routes/reportRoutes.js";
 
 dotenv.config();
 
-// Database Connection
+// Database
 connectDB();
 
 const app = express();
-
 const server = http.createServer(app);
 
-// Allowed Frontends
-
+// Allowed Origins
 const allowedOrigins = [
   "http://localhost:5173",
-
   "https://clothing-swap-admin.vercel.app",
 ];
 
 // Socket.IO
-
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
 
 chatSocket(io);
 
-// CORS
-
+// Middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) {
-        return callback(null, true);
-      }
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      return callback(null, true); // temporarily allow all
     },
-
     credentials: true,
   }),
 );
 
-// Handle OPTIONS request
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-app.options("*", cors());
-
-// Body Parser
-
-app.use(
-  express.json({
-    limit: "10mb",
-  }),
-);
-
-app.use(
-  express.urlencoded({
-    extended: true,
-
-    limit: "10mb",
-  }),
-);
-
-// API Routes
-
-app.use("/api/auth", authRoutes);
-
-app.use("/api/users", userRoutes);
-
-app.use("/api/items", itemRoutes);
-
-app.use("/api/swaps", swapRoutes);
-
-app.use("/api/chat", chatRoutes);
-
-app.use("/api/admin", adminRoutes);
-
-app.use("/api/notifications", notificationRoutes);
-
-app.use("/api/reports", reportRoutes);
-
-// Cloudinary use गरेपछि uploads folder चाहिँदैन
-
-// Remove this:
-// app.use("/uploads", express.static("uploads"));
-
-// Test Route
-
+// Health Check
 app.get("/", (req, res) => {
   res.status(200).json({
+    success: true,
     message: "Clothing Swap API Running 🚀",
-
-    status: "success",
   });
 });
 
-// 404 Route
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/swaps", swapRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/reports", reportRoutes);
 
-app.use((req, res) => {
+// 404
+app.use("*", (req, res) => {
   res.status(404).json({
+    success: false,
     message: "Route not found",
   });
 });
 
 // Error Handler
-
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error("Server Error:", err);
 
-  res.status(500).json({
-    message: "Server Error",
-
-    error: err.message,
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
   });
 });
 
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
