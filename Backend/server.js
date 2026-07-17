@@ -57,7 +57,8 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(null, true); // temporarily allow all
+      // Temporarily allow all origins
+      return callback(null, true);
     },
     credentials: true,
   }),
@@ -74,7 +75,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/items", itemRoutes);
@@ -84,15 +85,15 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reports", reportRoutes);
 
-// 404
-app.use("*", (req, res) => {
+// 404 Handler (Express 5 Compatible)
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "Route not found",
   });
 });
 
-// Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Server Error:", err);
 
