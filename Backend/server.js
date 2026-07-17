@@ -32,8 +32,7 @@ const server = http.createServer(app);
 
 // Allowed Origins
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://clothing-swap-admin.vercel.app",
+  "https://clothingswap-gamma.vercel.app"
 ];
 
 // Socket.IO
