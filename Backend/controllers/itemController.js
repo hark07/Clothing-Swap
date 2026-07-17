@@ -5,10 +5,6 @@ import Item from "../models/Item.js";
  */
 export const createItem = async (req, res) => {
   try {
-    console.log("USER:", req.user);
-    console.log("BODY:", req.body);
-    console.log("FILES:", req.files);
-
     const {
       title,
       category,
@@ -20,11 +16,8 @@ export const createItem = async (req, res) => {
       location,
     } = req.body;
 
-    const imageUrls =
-      req.files?.map(
-        (file) =>
-          `${req.protocol}://${req.get("host")}/uploads/${file.filename}`,
-      ) || [];
+    // Cloudinary image URLs
+    const imageUrls = req.files?.map((file) => file.path) || [];
 
     const item = await Item.create({
       owner: req.user._id,
@@ -44,9 +37,7 @@ export const createItem = async (req, res) => {
       item,
     });
   } catch (error) {
-    console.log("ERROR START");
-    console.log(error);
-    console.log("ERROR END");
+    console.error(error);
 
     res.status(500).json({
       success: false,
