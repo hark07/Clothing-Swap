@@ -31,23 +31,28 @@ const app = express();
 
 const server = http.createServer(app);
 
-// Socket.IO
+// Socket.IO Configuration
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://your-frontend-url.vercel.app"],
+    origin: ["http://localhost:5173", "https://clothing-swap-admin.vercel.app"],
     credentials: true,
   },
 });
 
 chatSocket(io);
 
-// CORS
+// CORS Configuration
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://clothing-swap-admin.vercel.app"],
+
     credentials: true,
+
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
@@ -66,7 +71,7 @@ app.use(
   }),
 );
 
-// Routes
+// API Routes
 
 app.use("/api/auth", authRoutes);
 
@@ -84,9 +89,9 @@ app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/reports", reportRoutes);
 
-// Cloudinary use गरेकोले uploads folder हटाइएको छ
+// Cloudinary use गरेकोले uploads folder चाहिँदैन
 
-// Test API
+// Test Route
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -95,17 +100,17 @@ app.get("/", (req, res) => {
   });
 });
 
-// Error Handler
+// Global Error Handler
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error("ERROR:", err);
 
   res.status(500).json({
-    message: err.message || "Server Error",
+    message: err.message || "Internal Server Error",
   });
 });
 
-// Server
+// Server Start
 
 const PORT = process.env.PORT || 5000;
 
