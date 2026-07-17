@@ -5,7 +5,7 @@ const ItemCard = ({ item }) => {
   const imageUrl = item.images?.[0]
     ? item.images[0].startsWith("http")
       ? item.images[0]
-      : `http://localhost:5000${item.images[0]}`
+      : `https://clothing-swap.onrender.com${item.images[0]}`
     : "";
 
   return (

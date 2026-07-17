@@ -67,7 +67,7 @@ const Dashboard = () => {
         return image;
       }
 
-      return `http://localhost:5000${image}`;
+      return `https://clothing-swap.onrender.com${image}`;
     }
 
     return "https://placehold.co/600x600?text=No+Image";

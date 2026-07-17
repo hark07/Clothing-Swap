@@ -47,7 +47,7 @@ const Chat = () => {
     if (!user?._id || !swapId) return;
 
     socketRef.current = io(
-      import.meta.env.VITE_SOCKET_URL || "http://localhost:5000",
+      import.meta.env.VITE_SOCKET_URL || "https://clothing-swap.onrender.com",
     );
 
     socketRef.current.emit("join_room", swapId);

@@ -164,13 +164,13 @@ const SwapRequests = () => {
               const requesterImage = swap.requesterItem?.images?.[0]
                 ? swap.requesterItem.images[0].startsWith("http")
                   ? swap.requesterItem.images[0]
-                  : `http://localhost:5000${swap.requesterItem.images[0]}`
+                  : `https://clothing-swap.onrender.com${swap.requesterItem.images[0]}`
                 : "/placeholder.png";
 
               const receiverImage = swap.receiverItem?.images?.[0]
                 ? swap.receiverItem.images[0].startsWith("http")
                   ? swap.receiverItem.images[0]
-                  : `http://localhost:5000${swap.receiverItem.images[0]}`
+                  : `https://clothing-swap.onrender.com${swap.receiverItem.images[0]}`
                 : "/placeholder.png";
 
               return (
