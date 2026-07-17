@@ -24,37 +24,56 @@ import reportRoutes from "./routes/reportRoutes.js";
 
 dotenv.config();
 
-// Connect Database
+// Database Connection
 connectDB();
 
 const app = express();
 
 const server = http.createServer(app);
 
-// Socket.IO Configuration
+// Allowed Frontends
+
+const allowedOrigins = [
+  "http://localhost:5173",
+
+  "https://clothing-swap-admin.vercel.app",
+];
+
+// Socket.IO
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://clothing-swap-admin.vercel.app"],
+    origin: allowedOrigins,
+
     credentials: true,
   },
 });
 
 chatSocket(io);
 
-// CORS Configuration
+// CORS
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://clothing-swap-admin.vercel.app"],
+    origin: function (origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
 
     credentials: true,
-
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-
-    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+// Handle OPTIONS request
+
+app.options("*", cors());
 
 // Body Parser
 
@@ -67,6 +86,7 @@ app.use(
 app.use(
   express.urlencoded({
     extended: true,
+
     limit: "10mb",
   }),
 );
@@ -89,28 +109,40 @@ app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/reports", reportRoutes);
 
-// Cloudinary use गरेकोले uploads folder चाहिँदैन
+// Cloudinary use गरेपछि uploads folder चाहिँदैन
+
+// Remove this:
+// app.use("/uploads", express.static("uploads"));
 
 // Test Route
 
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Clothing Swap API Running 🚀",
+
     status: "success",
   });
 });
 
-// Global Error Handler
+// 404 Route
 
-app.use((err, req, res, next) => {
-  console.error("ERROR:", err);
-
-  res.status(500).json({
-    message: err.message || "Internal Server Error",
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route not found",
   });
 });
 
-// Server Start
+// Error Handler
+
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json({
+    message: "Server Error",
+
+    error: err.message,
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 
